@@ -41,7 +41,7 @@ namespace LojaGames.Controllers
                 return Ok(Resposta);
             }
 
-            [HttpGet("nome/{nome}/{console}")]
+            [HttpGet("nome/{nome}/ouconsole/{console}")]
             public async Task<ActionResult> GetByNomeCon(string nome , string console)
             {
                 return Ok(await _produtoService.GetByNomeCon(nome, console));
