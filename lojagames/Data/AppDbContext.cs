@@ -11,6 +11,7 @@ namespace LojaGames.Data
         {
             modelBuilder.Entity<Produto>().ToTable("tb_Produtos");
             modelBuilder.Entity<Categoria>().ToTable("tb_Categorias");
+            modelBuilder.Entity<User>().ToTable("tb_Usuarios");
 
             _ = modelBuilder.Entity<Produto>()
                 .HasOne(_ => _.Categoria)
@@ -24,6 +25,8 @@ namespace LojaGames.Data
         public DbSet<Produto> Produtos { get; set; } = null!;
 
         public DbSet<Categoria> Categorias { get; set; } = null!;
+
+        public DbSet<User> Users { get; set; } = null!;
 
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -2,9 +2,15 @@
 using FluentValidation;
 using LojaGames.Data;
 using LojaGames.Model;
+using LojaGames.Security;
+using LojaGames.Security.Implements;
+using LojaGames.Service;
 using LojaGames.Service.Implements;
 using LojaGames.Validator;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace LojaGames
 {
@@ -30,13 +36,32 @@ namespace LojaGames
            );
 
             builder.Services.AddTransient<IValidator<Produto>, ProdutoValidator>();
-
             builder.Services.AddTransient<IValidator<Categoria>, CategoriaValidator>();
+            builder.Services.AddTransient<IValidator<User>, UserValidator>();
 
             builder.Services.AddScoped<IProdutoService, ProdutoService>();
-
             builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
+            builder.Services.AddTransient<IAuthService, AuthService>();
+
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+            {
+                var Key = Encoding.UTF8.GetBytes(Settings.Secret);
+                o.SaveToken = true;
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Key)
+                };
+            });
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -68,6 +93,7 @@ namespace LojaGames
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
